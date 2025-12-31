@@ -405,69 +405,10 @@
 })();
 
 
-(function(){
-const CONFIG = {
-  PRODUCT_NAME: 'EnviaAgora · Licença',
-  ISSUER_BLOG_ID: '3250349446996015558',
-  WIDGET_ID: 'LinkList6',
-  WIDGET_LICENSE_LABEL: 'Licença',
-
-  PUBLIC_KEY_PEM: `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr4lZpdQw9A4tAMuEyT4J
-D7OxrHG9HxfGYD/wSlyrKBpg5wy7HyNJT1eLZ43uwGm1+GorKx2Pevrxa/OIglSz
-ebWCbKDqYCYTr7lxUBlS929cJXwDt+3eZ5YdZKxR+EyhMiN/LT3aHIGAYr6CPe+M
-xnFr6r4lEiYU9aKQP2exl8jFVuQOUW+WdswAajMQ9JPcpfw3yZPHIxPpc29a2kk4
-1GzSA0Q5XtPjAOqbs53FOjGNIS/La9J3ZCKek+tB580X+JE6Vp+c0CVWf3a/qYpI
-7yQrCNIUyR545Ju00sSHnqKhKUKy0RydwrEfdSgW6oxi2r2v2+9nWGffjuFfTdPj
-kQIDAQAB
------END PUBLIC KEY-----`,
-
-  // opcionais:
-  BLOCK_ALL_CSS: true,
-  DEBUG: true
-};
 
 
-  const te=new TextEncoder(), td=new TextDecoder();
-  const norm=s=>s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
-
-  const b64uDec=s=>{const b64=s.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(s.length/4)*4,'=');const bin=atob(b64),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return u8.buffer;}
-  const pemToBuf=pem=>{const b64=String(pem).replace(/-----BEGIN [^-]+-----/,'').replace(/-----END [^-]+-----/,'').replace(/\s+/g,'');const raw=atob(b64),u=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)u[i]=raw.charCodeAt(i);return u.buffer;}
-  const importPub=pem=>crypto.subtle.importKey('spki',pemToBuf(pem),{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['verify']);
-
-  function getBlogId(){
-    if (window.BLOGGER_ID) return String(window.BLOGGER_ID);
-    const m=document.querySelector('meta[name="blogger-blog-id"]'); if(m&&m.content) return String(m.content);
-    const html=document.documentElement.innerHTML;
-    let r=/"blogId"\s*:\s*"(\d+)"/.exec(html)||/data-blog-id=['"](\d+)['"]/i.exec(html)||/blogger\.blogId\s*=\s*['"](\d+)['"]/i.exec(html);
-    return r ? r[1] : 'UNKNOWN';
-  }
-
-  function ensureStyles(){
-    if (document.getElementById('tb-lic-css')) return;
-    const css=document.createElement('style'); css.id='tb-lic-css';
-    css.textContent='.tb-lic-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:2147483647;display:flex;align-items:center;justify-content:center}.tb-lic-card{width:min(560px,94vw);background:#111;color:#fff;border-radius:16px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial}.tb-lic-card h1{font-size:22px;margin:0 0 8px}.tb-lic-card p{opacity:.9;line-height:1.5;margin:0 0 14px}.tb-lic-badge{display:inline-block;background:#222;border:1px solid #333;border-radius:999px;padding:6px 10px;font-size:12px;margin-bottom:10px}';
-    document.head.appendChild(css);
-  }
-  function showBlocker(msg){
-    ensureStyles();
-    const o=document.createElement('div');o.className='tb-lic-overlay';
-    const c=document.createElement('div');c.className='tb-lic-card';
-    c.innerHTML=`<span class="tb-lic-badge">${CONFIG.PRODUCT_NAME}</span><h1>Ativação necessária</h1><p>${msg}</p><p style="opacity:.8">Abra <em>Layout → Configurações</em> e cole o token no item "<strong>${CONFIG.WIDGET_LICENSE_LABEL}</strong>" do widget <strong>${CONFIG.WIDGET_ID}</strong>.</p>`;
-    o.appendChild(c);document.body.appendChild(o);if(CONFIG.BLOCK_ALL_CSS)document.documentElement.style.overflow='hidden';
-  }
-  function hideBlocker(){ const o=document.querySelector('.tb-lic-overlay'); if(o)o.remove(); document.documentElement.style.overflow=''; }
-
-  // Ler token do(s) LinkList
-  function allLinkLists(){ return Array.from(document.querySelectorAll('[id^="LinkList"]')); }
-  function mapFromLinkList(el){
-    const map={};
-    el.querySelectorAll('.widget-content a').forEach(a=>{
-      const key=(a.textContent||a.innerText||'').trim(); let val=(a.getAttribute('href')||'').trim();
-      if(!key) return;
-      if(val.startsWith('license:')) val=val.slice(8);
-      if(val.startsWith('token:'))   val=val.slice(6);
-      if(val.startsWith('<')&&val.endsWith('>')) val=val.slice(1,-1);
+  
+  if(val.startsWith('<')&&val.endsWith('>')) val=val.slice(1,-1);
       map[norm(key)]=val;
     });
     return map;
